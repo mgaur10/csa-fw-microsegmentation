@@ -44,7 +44,7 @@ From the root folder of this repo, run the following commands:
 export TF_VAR_organization_id=[YOUR_ORGANIZATION_ID]
 export TF_VAR_microseg_project_id=[YOUR_PROJECT_ID]
 terraform init
-terraform apply -auto-approve
+terraform apply
 ```
 
 To find your organization id, run the following command: 
@@ -55,9 +55,7 @@ gcloud projects get-ancestors [YOUR_PROJECT_ID]
 If you get Error: "Provider produced inconsistent final plan", then re-run the below commands to complete the deployment.
 
 ```
-terraform init
-terraform apply --refresh-only
-terraform apply -auto-approve
+terraform apply 
 ```
 
 
