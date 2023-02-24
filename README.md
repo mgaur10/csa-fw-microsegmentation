@@ -29,7 +29,7 @@ The following steps should be executed in Cloud Shell in the Google Cloud Consol
 Follow the steps in [this guide](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
 
 ### 2. Get the code
-Clone this github repository go to the root of the repository.
+Clone this github repository.
 
 ``` 
 git clone http://github.com/mgaur10/csa-fw-microsegmentation
@@ -59,7 +59,7 @@ terraform apply
 ```
 
 
-**Note:** All the other variables are give a default value. If you wish to change, update the corresponding variables in variable.tf file.
+**Note:** All the other variables are given a default value. If you wish to change, update the corresponding variables in the variable.tf file.
 
 
 
