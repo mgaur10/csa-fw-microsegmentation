@@ -3,7 +3,7 @@ This demo uses terraform to setup CSA Firewall Micro-segmentation demo in a proj
 
 
 ## Demo Architecture Diagram
-The image below describes the architecture of CSA Firewall Micro-segmentation demo to protect against DDoS attack.
+The image below describes the architecture of CSA Firewall Micro-segmentation demo.
 
 ![Architecture Diagram](./fw-microseg-arch.png)
 
