@@ -177,7 +177,7 @@ resource "google_storage_bucket_object" "db_sample_data" {
 # Wait delay after enabling APIs
 resource "time_sleep" "wait_sql_sa_role" {
   depends_on      = [google_project_iam_member.sql_object_access]
-  create_duration = "45s"
+  create_duration = "120s"
 }
 
 
