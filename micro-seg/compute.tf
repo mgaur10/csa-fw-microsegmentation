@@ -87,10 +87,10 @@ resource "google_compute_region_instance_group_manager" "pri_instgrp_pplapp_pres
   base_instance_name = "${var.primary_network_region}-prod-presentation"
   target_size        = 2
 
-  auto_healing_policies {
-    health_check      = google_compute_health_check.default.id
-    initial_delay_sec = 300
-  }
+ # auto_healing_policies {
+ #   health_check      = google_compute_health_check.default.id
+ #   initial_delay_sec = 800
+ # }
   depends_on = [
     google_compute_instance_template.pri_insttmpl_pplapp_presentation,
     google_compute_health_check.default,
@@ -103,8 +103,8 @@ resource "google_compute_region_instance_group_manager" "pri_instgrp_pplapp_pres
 # Wait delay after instance templates and instance group manager
 resource "time_sleep" "wait_enable_for_instances" {
 
-  create_duration  = "120s"
-  destroy_duration = "120s"
+  create_duration  = "180s"
+  destroy_duration = "45s"
 
   depends_on = [
     google_compute_region_instance_group_manager.pri_instgrp_pplapp_presentation,
@@ -332,10 +332,10 @@ resource "google_compute_region_instance_group_manager" "pri_instgrp_pplapp_midd
   base_instance_name = "${var.primary_network_region}-prod-middleware"
   target_size        = 2
 
-  auto_healing_policies {
-    health_check      = google_compute_health_check.default.id
-    initial_delay_sec = 300
-  }
+ # auto_healing_policies {
+ #   health_check      = google_compute_health_check.default.id
+ #   initial_delay_sec = 800
+ # }
   depends_on = [
     google_compute_instance_template.pri_insttmpl_pplapp_middleware,
     google_compute_health_check.default,
@@ -568,10 +568,10 @@ resource "google_compute_region_instance_group_manager" "sec_instgrp_pplapp_pres
   base_instance_name = "${var.secondary_network_region}-prod-presentation"
   target_size        = 2
 
-  auto_healing_policies {
-    health_check      = google_compute_health_check.default.id
-    initial_delay_sec = 300
-  }
+#  auto_healing_policies {
+ #   health_check      = google_compute_health_check.default.id
+ #   initial_delay_sec = 800
+ # }
   depends_on = [
     google_compute_instance_template.sec_insttmpl_pplapp_presentation,
     google_compute_health_check.default,
@@ -790,10 +790,10 @@ resource "google_compute_region_instance_group_manager" "sec_instgrp_pplapp_midd
   base_instance_name = "${var.secondary_network_region}-prod-middleware"
   target_size        = 2
 
-  auto_healing_policies {
-    health_check      = google_compute_health_check.default.id
-    initial_delay_sec = 300
-  }
+ # auto_healing_policies {
+ #   health_check      = google_compute_health_check.default.id
+ #   initial_delay_sec = 800
+ # }
   depends_on = [
     google_compute_instance_template.sec_insttmpl_pplapp_middleware,
     google_compute_health_check.default,
