@@ -47,12 +47,13 @@ terraform init
 terraform apply -auto-approve
 ```
 
-To find your organization id, , run the following command: 
+To find your organization id, run the following command: 
 ```
 gcloud projects get-ancestors [YOUR_PROJECT_ID]
 ```
 
-If you get a plan change error, then run the below commands to complete the deployement.
+If you get Error: "Provider produced inconsistent final plan", then re-run the below commands to complete the deployment.
+
 ```
 terraform init
 terraform apply --refresh-only
