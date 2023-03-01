@@ -13,7 +13,7 @@
 ##  limitations under the License.
 
 
-##  This code creates demo environment for CSA Network Firewall microsegmentation 
+##  This code creates demo environment for CSA Network Firewall microsegmentation  ##
 ##  This demo code is not built for production workload ##
 
 
@@ -33,7 +33,7 @@ variable "microseg_project_id" {
 variable "iam_secure_tag" {
   type        = string
   description = "Project ID to deploy resources"
-  default     = "fw-mic-seg-tag"
+  default     = "hr_pplapp_mkg"
 
 }
 

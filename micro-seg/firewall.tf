@@ -13,7 +13,7 @@
 ##  limitations under the License.
 
 
-##  This code creates demo environment for CSA Network Firewall microsegmentation 
+##  This code creates demo environment for CSA Network Firewall microsegmentation  ##
 ##  This demo code is not built for production workload ##
 
 
@@ -39,10 +39,10 @@ resource "google_compute_network_firewall_policy_association" "primary" {
 
 
 # allow access from health check ranges
-resource "google_compute_network_firewall_policy_rule" "allow_health_check" {
+resource "google_compute_network_firewall_policy_rule" "allow_health_check_glb" {
   project         = var.microseg_project_id
   action          = "allow"
-  description     = "Allow access from Health Check to Web Servers"
+  description     = "Allow access from Health Check and GLB to Web Servers"
   direction       = "INGRESS"
   disabled        = false
   enable_logging  = true
@@ -358,7 +358,7 @@ resource "google_compute_network_firewall_policy_rule" "allow_private_access" {
 
     layer4_configs {
       ip_protocol = "tcp"
-      ports       = [80, 443]
+      ports       = [443]
     }
   }
   depends_on = [
@@ -366,6 +366,97 @@ resource "google_compute_network_firewall_policy_rule" "allow_private_access" {
     google_compute_network_firewall_policy_association.primary,
   ]
 }
+
+
+# Network Firewall rule for your instances to download packages private access 
+resource "google_compute_network_firewall_policy_rule" "allow_restricted_access" {
+  project         = var.microseg_project_id
+  action          = "allow"
+  description     = "Rule to allow VMs access to Restricted Google APIs"
+  direction       = "EGRESS"
+  disabled        = false
+  enable_logging  = true
+  firewall_policy = google_compute_network_firewall_policy.primary.name
+  priority        = 80010
+  rule_name       = "allow-restricted-access"
+  #  target_service_accounts = ["emailAddress:my@service-account.com"]
+
+  match {
+    dest_ip_ranges = ["199.36.153.4/30"]
+
+    layer4_configs {
+      ip_protocol = "tcp"
+      ports       = [443]
+    }
+  }
+  depends_on = [
+    google_compute_network_firewall_policy.primary,
+    google_compute_network_firewall_policy_association.primary,
+  ]
+}
+
+/*
+## Network Firewall terraform does not support FQDN yet; We will be using a local-exec to setup this firewall rule
+## Network Firewall rule for your instances to download packages private access 
+## https://github.com/hashicorp/terraform-provider-google/issues/13688
+resource "google_compute_network_firewall_policy_rule" "allow_restricted_access_php" {
+  project         = var.microseg_project_id
+  action          = "allow"
+  description     = "Allow access to install PHP Google Client Libraries"
+  direction       = "EGRESS"
+  disabled        = false
+  enable_logging  = true
+  firewall_policy = google_compute_network_firewall_policy.primary.name
+  priority        = 80100
+  rule_name       = "allow-restricted-access-php"
+  #  target_service_accounts = ["emailAddress:my@service-account.com"]
+
+  match {
+    dest_fqdns = ["repo.packagist.org", "api.github.com",  "codeload.github.com"]
+
+    layer4_configs {
+      ip_protocol = "tcp"
+      ports       = [443]
+    }
+  }
+  depends_on = [
+    google_compute_network_firewall_policy.primary,
+    google_compute_network_firewall_policy_association.primary,
+  ]
+}
+*/
+
+
+
+# Network Firewall rule for your instances to download packages private access 
+resource "null_resource" "allow_restricted_access_php" {
+  triggers = {
+    project     = var.microseg_project_id
+    policy_name = "${google_compute_network_firewall_policy.primary.name}"
+  }
+
+  provisioner "local-exec" {
+    command     = <<EOT
+    gcloud beta compute network-firewall-policies rules create 80100 --action allow --firewall-policy "${google_compute_network_firewall_policy.primary.name}" --description "Allow access to install PHP Google Client Libraries" --direction EGRESS --dest-fqdns repo.packagist.org,api.github.com,codeload.github.com --layer4-configs tcp:443 --enable-logging --no-disabled --global-firewall-policy --project "${var.microseg_project_id}"
+    EOT
+    working_dir = path.module
+  }
+
+  provisioner "local-exec" {
+    when        = destroy
+    command     = <<EOT
+    gcloud beta compute network-firewall-policies rules delete 80100  --firewall-policy "${self.triggers.policy_name}" --project "${self.triggers.project}" --global-firewall-policy
+    EOT
+    working_dir = path.module
+  }
+
+  depends_on = [
+    google_compute_network_firewall_policy.primary,
+    google_compute_network_firewall_policy_association.primary,
+  ]
+}
+
+
 
 
 
@@ -408,7 +499,7 @@ resource "google_compute_network_firewall_policy_rule" "deny_ingress_ipv6" {
   disabled        = false
   enable_logging  = true
   firewall_policy = google_compute_network_firewall_policy.primary.name
-  priority        = 2000000010
+  priority        = 2000000001
   rule_name       = "deny-ingress-ipv6"
   #  target_service_accounts = ["emailAddress:my@service-account.com"]
 
@@ -434,7 +525,7 @@ resource "google_compute_network_firewall_policy_rule" "deny_egress_ipv4" {
   disabled        = false
   enable_logging  = true
   firewall_policy = google_compute_network_firewall_policy.primary.name
-  priority        = 2000000020
+  priority        = 2000000010
   rule_name       = "deny-ingress-ipv4"
   #  target_service_accounts = ["emailAddress:my@service-account.com"]
 
@@ -461,7 +552,7 @@ resource "google_compute_network_firewall_policy_rule" "deny_egress_ipv6" {
   disabled        = false
   enable_logging  = true
   firewall_policy = google_compute_network_firewall_policy.primary.name
-  priority        = 2000000030
+  priority        = 2000000011
   rule_name       = "deny-ingress-ipv6"
   #  target_service_accounts = ["emailAddress:my@service-account.com"]
 

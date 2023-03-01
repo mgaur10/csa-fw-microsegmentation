@@ -13,7 +13,7 @@
 ##  limitations under the License.
 
 
-##  This code creates demo environment for CSA Network Firewall microsegmentation 
+##  This code creates demo environment for CSA Network Firewall microsegmentation  ##
 ##  This demo code is not built for production workload ##
 
 
@@ -101,6 +101,54 @@ resource "google_compute_subnetwork" "primary_middleware_subnetwork" {
 }
 
 
+# Create a CloudRouter for primary middleware subnet
+resource "google_compute_router" "primary_middleware_router" {
+  project = var.microseg_project_id
+  name    = "cloudr-microseg-${var.primary_network_region}"
+  region  = var.primary_network_region
+  network = google_compute_network.primary_network.id
+
+  bgp {
+    asn = 64514
+  }
+  depends_on = [
+    google_compute_network.primary_network,
+  ]
+}
+
+# Configure a CloudNAT for primary middleware subnet
+resource "google_compute_router_nat" "primary_middleware_nats" {
+  project                            = var.microseg_project_id
+  name                               = "cloudnat-microseg-${var.primary_network_region}"
+  router                             = google_compute_router.primary_middleware_router.name
+  region                             = google_compute_router.primary_middleware_router.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
+  subnetwork {
+    name                    = google_compute_subnetwork.primary_middleware_subnetwork.self_link
+    source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
+  }
+
+  log_config {
+    enable = true
+    filter = "ALL"
+  }
+  depends_on = [
+    google_compute_router.primary_middleware_router,
+    google_compute_subnetwork.primary_middleware_subnetwork,
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
 
 # Primary sub-proxy subnet for load balancer
 resource "google_compute_subnetwork" "primary_sub_proxy" {
@@ -165,6 +213,42 @@ resource "google_compute_subnetwork" "secondary_middleware_subnetwork" {
   ]
 }
 
+
+# Create a CloudRouter for secondary middleware subnet
+resource "google_compute_router" "secondary_middleware_router" {
+  project = var.microseg_project_id
+  name    = "cloudr-microseg-${var.secondary_network_region}"
+  region  = var.secondary_network_region
+  network = google_compute_network.primary_network.id
+
+  bgp {
+    asn = 64514
+  }
+  depends_on = [google_compute_network.primary_network]
+}
+
+# Configure a CloudNAT for secondary middleware subnet
+resource "google_compute_router_nat" "secondary_middleware_nats" {
+  project                            = var.microseg_project_id
+  name                               = "cloudnat-microseg-${var.secondary_network_region}"
+  router                             = google_compute_router.secondary_middleware_router.name
+  region                             = google_compute_router.secondary_middleware_router.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
+  subnetwork {
+    name                    = google_compute_subnetwork.secondary_middleware_subnetwork.self_link
+    source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
+  }
+
+  log_config {
+    enable = true
+    filter = "ALL"
+  }
+  depends_on = [
+    google_compute_router.secondary_middleware_router,
+    google_compute_subnetwork.secondary_middleware_subnetwork,
+  ]
+}
 
 
 

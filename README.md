@@ -1,9 +1,14 @@
+```
+This is not an officially supported Google product.
+This code creates PoC demo environment for CSA Network Firewall microsegmentation. This demo code is not built for production workload. 
+```
+
 # Demo Guide
 This demo uses terraform to setup CSA Firewall Micro-segmentation demo in a project and underlying infrastructure using Google Cloud Services like [Resource Manager - IAM Tags](https://cloud.google.com/resource-manager), [Cloud Firewall](https://cloud.google.com/firewall), [Cloud Armor](https://cloud.google.com/armor), [Cloud Compute Engine](https://cloud.google.com/compute) and [Cloud Logging](https://cloud.google.com/logging).
 
 
 ## Demo Architecture Diagram
-The image below describes the architecture of CSA Firewall Micro-segmentation demo.
+The image below describes the architecture of CSA Firewall Micro-segmentation demo to protect against DDoS attack.
 
 ![Architecture Diagram](./fw-microseg-arch.png)
 
@@ -29,7 +34,7 @@ The following steps should be executed in Cloud Shell in the Google Cloud Consol
 Follow the steps in [this guide](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
 
 ### 2. Get the code
-Clone this github repository.
+Clone this github repository go to the root of the repository.
 
 ``` 
 git clone http://github.com/mgaur10/csa-fw-microsegmentation
@@ -53,13 +58,12 @@ gcloud projects get-ancestors [YOUR_PROJECT_ID]
 ```
 
 If you get Error: "Provider produced inconsistent final plan", then re-run the below commands to complete the deployment.
-
 ```
-terraform apply 
+terraform apply
 ```
 
 
-**Note:** All the other variables are given a default value. If you wish to change, update the corresponding variables in the variable.tf file.
+**Note:** All the other variables are give a default value. If you wish to change, update the corresponding variables in variable.tf file.
 
 
 

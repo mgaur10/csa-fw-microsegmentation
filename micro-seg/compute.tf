@@ -13,7 +13,7 @@
 ##  limitations under the License.
 
 
-##  This code creates demo environment for CSA Network Firewall microsegmentation 
+##  This code creates demo environment for CSA Network Firewall microsegmentation  ##
 ##  This demo code is not built for production workload ##
 
 
@@ -51,11 +51,11 @@ resource "google_compute_instance_template" "pri_insttmpl_pplapp_presentation" {
   }
 
   metadata_startup_script = file("${path.module}/scripts/pri-pst-ins-temp-startup.sh")
-  # service_account {
-  # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-  #   email  = google_service_account.xyz.email
-  #   scopes = ["cloud-platform"]
-  # }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = google_service_account.primary_sa_pplapp_presentation.email
+    scopes = ["cloud-platform"]
+  }
 
 
   depends_on = [
@@ -63,6 +63,7 @@ resource "google_compute_instance_template" "pri_insttmpl_pplapp_presentation" {
     google_compute_subnetwork.primary_presentation_subnetwork,
     google_dns_record_set.spf,
     google_compute_network_firewall_policy_rule.allow_private_access,
+    google_service_account.primary_sa_pplapp_presentation,
   ]
 }
 
@@ -87,10 +88,10 @@ resource "google_compute_region_instance_group_manager" "pri_instgrp_pplapp_pres
   base_instance_name = "${var.primary_network_region}-prod-presentation"
   target_size        = 2
 
- # auto_healing_policies {
- #   health_check      = google_compute_health_check.default.id
- #   initial_delay_sec = 800
- # }
+  # auto_healing_policies {
+  #   health_check      = google_compute_health_check.default.id
+  #   initial_delay_sec = 800
+  # }
   depends_on = [
     google_compute_instance_template.pri_insttmpl_pplapp_presentation,
     google_compute_health_check.default,
@@ -296,19 +297,22 @@ resource "google_compute_instance_template" "pri_insttmpl_pplapp_middleware" {
   }
 
   metadata_startup_script = file("${path.module}/scripts/pri-mdl-ins-temp-startup.sh")
-  # service_account {
-  # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-  #   email  = google_service_account.xyz.email
-  #   scopes = ["cloud-platform"]
-  # }
-  #    metadata = {
-  #  DB_PASS = "${google_secret_manager_secret_version.sql_db_user_password.secret_data}"
-  #  }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = google_service_account.primary_sa_pplapp_middleware.email
+    scopes = ["cloud-platform"]
+  }
+  metadata = {
+    DB_SEC  = "${google_secret_manager_secret.sql_db_user_password.secret_id}"
+    PROJ_ID = "${var.microseg_project_id}"
+  }
   depends_on = [
     google_compute_network.primary_network,
     google_compute_subnetwork.primary_middleware_subnetwork,
     google_dns_record_set.spf,
     google_compute_network_firewall_policy_rule.allow_private_access,
+    google_service_account.primary_sa_pplapp_middleware,
+    google_secret_manager_secret.sql_db_user_password
   ]
 }
 
@@ -332,10 +336,10 @@ resource "google_compute_region_instance_group_manager" "pri_instgrp_pplapp_midd
   base_instance_name = "${var.primary_network_region}-prod-middleware"
   target_size        = 2
 
- # auto_healing_policies {
- #   health_check      = google_compute_health_check.default.id
- #   initial_delay_sec = 800
- # }
+  # auto_healing_policies {
+  #   health_check      = google_compute_health_check.default.id
+  #   initial_delay_sec = 800
+  # }
   depends_on = [
     google_compute_instance_template.pri_insttmpl_pplapp_middleware,
     google_compute_health_check.default,
@@ -533,16 +537,17 @@ resource "google_compute_instance_template" "sec_insttmpl_pplapp_presentation" {
   }
 
   metadata_startup_script = file("${path.module}/scripts/sec-pst-ins-temp-startup.sh")
-  # service_account {
-  # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-  #   email  = google_service_account.xyz.email
-  #   scopes = ["cloud-platform"]
-  # }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = google_service_account.secondary_sa_pplapp_presentation.email
+    scopes = ["cloud-platform"]
+  }
   depends_on = [
     google_compute_network.primary_network,
     google_compute_subnetwork.secondary_middleware_subnetwork,
     google_dns_record_set.spf,
     google_compute_network_firewall_policy_rule.allow_private_access,
+    google_service_account.secondary_sa_pplapp_presentation,
 
   ]
 }
@@ -568,10 +573,10 @@ resource "google_compute_region_instance_group_manager" "sec_instgrp_pplapp_pres
   base_instance_name = "${var.secondary_network_region}-prod-presentation"
   target_size        = 2
 
-#  auto_healing_policies {
- #   health_check      = google_compute_health_check.default.id
- #   initial_delay_sec = 800
- # }
+  #  auto_healing_policies {
+  #   health_check      = google_compute_health_check.default.id
+  #   initial_delay_sec = 800
+  # }
   depends_on = [
     google_compute_instance_template.sec_insttmpl_pplapp_presentation,
     google_compute_health_check.default,
@@ -753,19 +758,21 @@ resource "google_compute_instance_template" "sec_insttmpl_pplapp_middleware" {
   }
 
   metadata_startup_script = file("${path.module}/scripts/sec-mdl-ins-temp-startup.sh")
-  # service_account {
-  # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
-  #   email  = google_service_account.xyz.email
-  #   scopes = ["cloud-platform"]
-  # }
-  #     metadata = {
-  #    DB_PASS = "${google_secret_manager_secret.sql_db_user_password.secret_id}"
-  #    DB_PASS = "${google_secret_manager_secret_version.sql_db_user_password.secret_data}"
-  # }
+  service_account {
+    # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+    email  = google_service_account.secondary_sa_pplapp_middleware.email
+    scopes = ["cloud-platform"]
+  }
+  metadata = {
+    DB_SEC  = "${google_secret_manager_secret.sql_db_user_password.secret_id}"
+    PROJ_ID = "${var.microseg_project_id}"
+  }
   depends_on = [
     google_compute_network.primary_network,
     google_compute_subnetwork.secondary_middleware_subnetwork,
     google_dns_record_set.spf,
+    google_service_account.secondary_sa_pplapp_middleware,
+    google_secret_manager_secret.sql_db_user_password,
   ]
 }
 
@@ -790,10 +797,10 @@ resource "google_compute_region_instance_group_manager" "sec_instgrp_pplapp_midd
   base_instance_name = "${var.secondary_network_region}-prod-middleware"
   target_size        = 2
 
- # auto_healing_policies {
- #   health_check      = google_compute_health_check.default.id
- #   initial_delay_sec = 800
- # }
+  # auto_healing_policies {
+  #   health_check      = google_compute_health_check.default.id
+  #   initial_delay_sec = 800
+  # }
   depends_on = [
     google_compute_instance_template.sec_insttmpl_pplapp_middleware,
     google_compute_health_check.default,

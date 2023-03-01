@@ -13,67 +13,37 @@
 ##  limitations under the License.
 
 
-##  This code creates demo environment for CSA Network Firewall microsegmentation 
+##  This code creates demo environment for CSA Network Firewall microsegmentation  ##
 ##  This demo code is not built for production workload ##
 
 
-
-########################### IAM Tags#############
-
-resource "google_tags_tag_key" "key" {
-  parent     = "organizations/${var.organization_id}"
-  short_name = var.iam_secure_tag
-
-  description = "For use with network firewall."
-  purpose     = "GCE_FIREWALL"
-  purpose_data = {
-    network = "${var.microseg_project_id}/${var.vpc_network_name}"
-  }
-  depends_on = [
-    time_sleep.wait_enable_service_api,
-    google_compute_network.primary_network,
-  ]
-}
-
-resource "google_tags_tag_value" "pri_ppl_value" {
-  parent      = "tagKeys/${google_tags_tag_key.key.name}"
-  short_name  = "prod_presentation_${var.primary_network_region}"
-  description = "Tag for primary prod presentation."
-  depends_on = [
-    google_tags_tag_key.key,
-  ]
-}
-
-resource "google_tags_tag_value" "pri_mdwl_value" {
-  parent      = "tagKeys/${google_tags_tag_key.key.name}"
-  short_name  = "prod_middleware_${var.primary_network_region}"
-  description = "Tag for primary prod middleware."
-  depends_on = [
-    google_tags_tag_key.key,
-  ]
-}
-
-resource "google_tags_tag_value" "sec_ppl_value" {
-  parent      = "tagKeys/${google_tags_tag_key.key.name}"
-  short_name  = "prod_presentation_${var.secondary_network_region}"
-  description = "Tag for secondary prod presentation."
-}
-
-resource "google_tags_tag_value" "sec_mdwl_value" {
-  parent      = "tagKeys/${google_tags_tag_key.key.name}"
-  short_name  = "prod_middleware_${var.secondary_network_region}"
-  description = "Tag for secondary prod middleware."
-  depends_on = [
-    google_tags_tag_key.key,
-  ]
+#Create the service Account primary presentation
+resource "google_service_account" "primary_sa_pplapp_presentation" {
+  project      = var.microseg_project_id
+  account_id   = "sa-pplapp-ppt-${var.primary_network_region}"
+  display_name = "Compute service account"
 }
 
 
-resource "google_tags_tag_value" "quart_tag_value" {
-  parent      = "tagKeys/${google_tags_tag_key.key.name}"
-  short_name  = "quarantine"
-  description = "Tag for incident response"
-  depends_on = [
-    google_tags_tag_key.key,
-  ]
+#Create the service Account primary middleware
+resource "google_service_account" "primary_sa_pplapp_middleware" {
+  project      = var.microseg_project_id
+  account_id   = "sa-pplapp-mdw-${var.primary_network_region}"
+  display_name = "Compute service account to access MySQL pwd"
 }
+
+
+#Create the service Account secondary  presentation
+resource "google_service_account" "secondary_sa_pplapp_presentation" {
+  project      = var.microseg_project_id
+  account_id   = "sa-pplapp-ppt-${var.secondary_network_region}"
+  display_name = "Compute service account"
+}
+
+#Create the service Account secondary  middleware
+resource "google_service_account" "secondary_sa_pplapp_middleware" {
+  project      = var.microseg_project_id
+  account_id   = "sa-pplapp-mdw-${var.secondary_network_region}"
+  display_name = "Compute service account to access MySQL pwd"
+}
+

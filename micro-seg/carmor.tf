@@ -13,7 +13,7 @@
 ##  limitations under the License.
 
 
-##  This code creates demo environment for CSA Network Firewall microsegmentation 
+##  This code creates demo environment for CSA Network Firewall microsegmentation  ##
 ##  This demo code is not built for production workload ##
 
 
@@ -99,7 +99,7 @@ resource "google_compute_security_policy" "armor_microseg" {
     priority = "50500"
     match {
       expr {
-        expression = "evaluatePreconfiguredWaf('methodenforcement-v33-stable', {'sensitivity': 4})"
+        expression = "evaluatePreconfiguredWaf('methodenforcement-v33-stable', {'sensitivity': 3})"
       }
     }
     description = "Method enforcement"
@@ -180,15 +180,6 @@ resource "google_compute_security_policy" "armor_microseg" {
 
 
 
-
-
-
-
-
-
-
-
-
   rule {
     action   = "deny(404)"
     priority = "90000"
@@ -225,7 +216,7 @@ resource "google_compute_security_policy" "armor_microseg" {
 
 
 
-
+  /*
   rule {
     action   = "deny(403)"
     priority = "9009"
@@ -236,7 +227,7 @@ resource "google_compute_security_policy" "armor_microseg" {
     }
     description = "block scanner detection"
   }
-
+*/
 
 
 

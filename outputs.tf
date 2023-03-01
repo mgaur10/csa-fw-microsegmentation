@@ -13,5 +13,10 @@
 ##  limitations under the License.
 
 
-##  This code creates demo environment for CSA Network Firewall microsegmentation 
+##  This code creates demo environment for CSA Network Firewall microsegmentation  ##
 ##  This demo code is not built for production workload ##
+
+
+output "global_load_balancer_ip" {
+  value = module.micro_seg.global_load_balancer_ip
+}

@@ -13,7 +13,7 @@
 ##  limitations under the License.
 
 
-##  This code creates demo environment for CSA Network Firewall microsegmentation 
+##  This code creates demo environment for CSA Network Firewall microsegmentation  ##
 ##  This demo code is not built for production workload ##
 
 
@@ -131,8 +131,7 @@ resource "google_sql_user" "db_password" {
   project  = var.microseg_project_id
   instance = google_sql_database_instance.private_sql_instance.name
   name     = "root"
-  password = "M1cr0segmentSQL!"
-  # "${google_secret_manager_secret_version.sql_db_user_password.secret_data}"
+  password = google_secret_manager_secret_version.sql_db_user_password.secret_data
 
   depends_on = [time_sleep.wait_enable_service_api,
     google_sql_database_instance.private_sql_instance,

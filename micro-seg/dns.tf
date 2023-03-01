@@ -13,7 +13,7 @@
 ##  limitations under the License.
 
 
-##  This code creates demo environment for CSA Network Firewall microsegmentation 
+##  This code creates demo environment for CSA Network Firewall microsegmentation  ##
 ##  This demo code is not built for production workload ##
 
 
@@ -95,4 +95,43 @@ resource "google_dns_record_set" "sec_ilb_pplapp_sqldb_microseg" {
     google_dns_managed_zone.private_zone,
     google_sql_database_instance.private_sql_instance,
   ]
+}
+
+
+
+
+resource "google_dns_managed_zone" "google_apis" {
+  name       = "google-apis"
+  dns_name   = "googleapis.com."
+  project    = var.microseg_project_id
+  visibility = "private"
+  private_visibility_config {
+    networks {
+      network_url = google_compute_network.primary_network.id
+    }
+  }
+  depends_on = [time_sleep.wait_enable_service_api,
+    google_compute_network.primary_network,
+  ]
+}
+
+resource "google_dns_record_set" "google_apis_1" {
+  name         = "restricted.${google_dns_managed_zone.google_apis.dns_name}"
+  managed_zone = google_dns_managed_zone.google_apis.name
+  type         = "A"
+  ttl          = 300
+  project      = var.microseg_project_id
+  rrdatas      = ["199.36.153.4", "199.36.153.5", "199.36.153.6", "199.36.153.7"]
+  depends_on   = [google_dns_managed_zone.google_apis]
+}
+
+
+resource "google_dns_record_set" "google_apis_2" {
+  name         = "*.${google_dns_managed_zone.google_apis.dns_name}"
+  managed_zone = google_dns_managed_zone.google_apis.name
+  type         = "CNAME"
+  ttl          = 300
+  project      = var.microseg_project_id
+  rrdatas      = ["restricted.googleapis.com."]
+  depends_on   = [google_dns_managed_zone.google_apis]
 }

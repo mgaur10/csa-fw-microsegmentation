@@ -13,7 +13,7 @@
 ##  limitations under the License.
 
 
-##  This code creates demo environment for CSA Network Firewall microsegmentation 
+##  This code creates demo environment for CSA Network Firewall microsegmentation  ##
 ##  This demo code is not built for production workload ##
 
 resource "random_password" "db_user_password" {
@@ -25,14 +25,14 @@ resource "random_password" "db_user_password" {
   depends_on  = [time_sleep.wait_enable_service_api]
 }
 
-
+/*
 resource "random_password" "db_user_name" {
   length    = 8
   min_lower = 8
 
   depends_on = [time_sleep.wait_enable_service_api]
 }
-
+*/
 
 resource "google_secret_manager_secret" "sql_db_user_password" {
   project   = var.microseg_project_id
@@ -46,9 +46,12 @@ resource "google_secret_manager_secret" "sql_db_user_password" {
 
 resource "google_secret_manager_secret_version" "sql_db_user_password" {
   secret      = google_secret_manager_secret.sql_db_user_password.id
-  secret_data = "M1cr0segmentSQL!"
-  #random_password.db_user_password.result
-  depends_on = [time_sleep.wait_enable_service_api]
+  secret_data = random_password.db_user_password.result
+  # "M1cr0segmentSQL!"
+  depends_on = [
+    time_sleep.wait_enable_service_api,
+    random_password.db_user_password,
+  ]
 }
 
 /*
@@ -57,12 +60,27 @@ data "google_compute_default_service_account" "default" {
      depends_on = [time_sleep.wait_enable_service_api]
 }
 
+*/
 
-resource "google_secret_manager_secret_iam_member" "identity_password_access" {
-#  for_each  = var.proxy_access_identities
-  project  = var.microseg_project_id
-  member    = "serviceAccount:${data.google_compute_default_service_account.default.email}"
+resource "google_secret_manager_secret_iam_member" "primary_middleware_access" {
+  project   = var.microseg_project_id
+  member    = "serviceAccount:${google_service_account.primary_sa_pplapp_middleware.email}"
   role      = "roles/secretmanager.secretAccessor"
   secret_id = google_secret_manager_secret.sql_db_user_password.id
+  depends_on = [
+    google_service_account.primary_sa_pplapp_middleware,
+    google_secret_manager_secret.sql_db_user_password,
+  ]
 }
-*/
+
+
+resource "google_secret_manager_secret_iam_member" "secondary_middleware_access" {
+  project   = var.microseg_project_id
+  member    = "serviceAccount:${google_service_account.secondary_sa_pplapp_middleware.email}"
+  role      = "roles/secretmanager.secretAccessor"
+  secret_id = google_secret_manager_secret.sql_db_user_password.id
+  depends_on = [
+    google_service_account.secondary_sa_pplapp_middleware,
+    google_secret_manager_secret.sql_db_user_password,
+  ]
+}

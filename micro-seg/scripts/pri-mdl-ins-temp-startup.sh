@@ -26,15 +26,42 @@ apt update
 apt -y install apache2
 apt -y install libapache2-mod-php
 apt -y install php-mysqli
+apt -y install php-bcmath
+apt -y install composer
+ DB_SEC=$(curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/DB_SEC" -H "Metadata-Flavor: Google")
+ PROJ_ID=$(curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/PROJ_ID" -H "Metadata-Flavor: Google")
+export HOME="/var/www"
+composer -d /var/www require google/cloud-secret-manager
 service apache2 reload
+rm /var/www/html/index.html
 cat <<EOF > /var/www/html/api.php
 <?php
 
+declare(strict_types=1);
+namespace Google\Cloud\Samples\SecretManager;
+require __DIR__ . '/../vendor/autoload.php';
+use Google\Cloud\SecretManager\V1\SecretManagerServiceClient;
+
 header("Content-Type:application/json");
 
-# connect to MySQL DB:
-# Can we use DNS to address the DB??? 
-\$con = mysqli_connect("hr_pplapp_us-west1_sqldb-microseg.microseg.private","root","M1cr0segmentSQL!","mydb");
+\$projectId = '$PROJ_ID';
+\$secretId = '$DB_SEC';
+\$versionId = '1';
+
+# Create the Secret Manager client.
+\$client = new SecretManagerServiceClient();
+
+# Build the resource name of the secret version.
+\$name = \$client->secretVersionName(\$projectId, \$secretId, \$versionId);
+
+# Access the secret version.
+\$secretresponse = \$client->accessSecretVersion(\$name);
+
+# Read the secret payload.
+\$payload = \$secretresponse->getPayload()->getData();
+
+# connect to MySQL DB: 
+\$con = mysqli_connect("hr_pplapp_us-west1_sqldb-microseg.microseg.private","root",\$payload,"mydb");
 if (mysqli_connect_errno()) {
   echo "Failed to connect to MySQL: " . mysqli_connect_error();
   die();
