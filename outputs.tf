@@ -20,3 +20,7 @@
 output "global_load_balancer_ip" {
   value = module.micro_seg.global_load_balancer_ip
 }
+  
+  output "note" {
+  value = "The GLB should be activated in a few minutes"
+}
