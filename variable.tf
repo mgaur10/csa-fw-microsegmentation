@@ -33,7 +33,7 @@ variable "microseg_project_id" {
 variable "iam_secure_tag" {
   type        = string
   description = "Project ID to deploy resources"
-  default     = "hr_pplapp_mkg"
+  default     = "hr_pplapp"
 
 }
 
@@ -60,19 +60,19 @@ variable "primary_network_zone" {
 variable "primary_presentation_subnetwork" {
   type        = string
   description = "Subnet range for primary presentation layer"
-  default     = "10.10.0.0/24"
+  default     = "10.10.0.0/28"
 }
 variable "primary_middleware_subnetwork" {
   type        = string
   description = "Subnet range for primary middleware layer"
-  default     = "10.30.0.0/24"
+  default     = "10.30.0.0/28"
 }
 
 
 variable "primary_sub_proxy" {
   type        = string
   description = "Subnet range proxy-only network for internal load balancer"
-  default     = "10.31.0.0/24"
+  default     = "10.31.0.0/26"
 }
 
 variable "primary_database_subnetwork" {
@@ -115,18 +115,18 @@ variable "secondary_network_zone" {
 variable "secondary_presentation_subnetwork" {
   type        = string
   description = "Subnet range for secondary presentation layer"
-  default     = "10.20.0.0/24"
+  default     = "10.20.0.0/28"
 }
 
 variable "secondary_middleware_subnetwork" {
   type        = string
   description = "Subnet range for secondary middleware layer"
-  default     = "10.40.0.0/24"
+  default     = "10.40.0.0/28"
 }
 
 variable "secondary_sub_proxy" {
   type        = string
   description = "Subnet range proxy-only network for internal load balancer"
-  default     = "10.41.0.0/24"
+  default     = "10.41.0.0/26"
 }
 
