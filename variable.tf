@@ -85,14 +85,14 @@ variable "primary_database_subnetwork" {
 variable "primary_ilb_ip" {
   type        = string
   description = "IP address for primary region internalload balancer"
-  default     = "10.30.0.100"
+  default     = "10.30.0.10"
 }
 
 
 variable "secondary_ilb_ip" {
   type        = string
   description = "IP address for secondary region internal load balancer"
-  default     = "10.40.0.100"
+  default     = "10.40.0.10"
 }
 
 
