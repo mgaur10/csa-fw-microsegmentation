@@ -4,7 +4,7 @@ This code creates PoC demo environment for CSA Network Firewall microsegmentatio
 ```
 
 # Demo Guide
-This demo uses terraform to setup CSA Firewall Micro-segmentation demo in a project and underlying infrastructure using Google Cloud Services like [Resource Manager - IAM Tags](https://cloud.google.com/resource-manager), [Cloud Firewall](https://cloud.google.com/firewall), [Cloud Armor](https://cloud.google.com/armor), [Cloud Compute Engine](https://cloud.google.com/compute) and [Cloud Logging](https://cloud.google.com/logging).
+This Cloud Security Architecture uses terraform to setup Firewall Micro-segmentation demo in a project and underlying infrastructure using Google Cloud Services like [Resource Manager - IAM Tags](https://cloud.google.com/resource-manager), [Cloud Firewall](https://cloud.google.com/firewall), [Cloud Armor](https://cloud.google.com/armor), [Cloud Compute Engine](https://cloud.google.com/compute) and [Cloud Logging](https://cloud.google.com/logging).
 
 
 ## Demo Architecture Diagram
